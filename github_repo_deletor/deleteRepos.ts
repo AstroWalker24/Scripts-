@@ -17,10 +17,10 @@ const API_URL: string = 'https://api.github.com';
 async function getRepos(): Promise<string[]>{
     try{
         const response:any = await axios.get(`${API_URL}/users/${GITHUB_USERNAME}/repos`,{
-            auth:{ username: GITHUB_USERNAME, password: GITHUB_TOKEN }
+            headers:{Authorization:`token ${GITHUB_TOKEN}`}
         });
 
-        return response.data.map((repo:any)=>repo.name);
+        return response.data.map((repo:any)=>repo.name + "\n");
     }
 
     catch(error){
