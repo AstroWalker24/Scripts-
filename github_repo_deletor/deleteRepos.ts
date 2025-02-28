@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+const prompt: any = require('prompt-sync')();
 
 dotenv.config();
 
@@ -19,9 +20,7 @@ async function getRepos(): Promise<string[]>{
             auth:{ username: GITHUB_USERNAME, password: GITHUB_TOKEN }
         });
 
-        return response.data.map((repo:any)=>{
-            repo.name
-        });
+        return response.data.map((repo:any)=>repo.name);
     }
 
     catch(error){
@@ -31,21 +30,43 @@ async function getRepos(): Promise<string[]>{
 }
 
 
-async function deleteRepo(repo_name: string){
+async function deleteRepo(repo_name: string): Promise<boolean>{
     try{
         const response: any = await axios.delete(`${API_URL}/repos/${GITHUB_USERNAME}/${repo_name}`,{
             auth:{username: GITHUB_USERNAME, password: GITHUB_TOKEN}
         });
         console.log("Successfully deleted",repo_name);
         
+        return true
     }
 
     catch(error){
         console.log("Error occured while deleting the repository")
+
+        return false 
     }
 }
 
+async function main(){
+    const repos: string[] = await getRepos();
 
+    if (repos.length === 0){
+        console.log("No repos found");
+        return ;
+    }
+
+    console.log(`Found ${repos.length} repositories`);
+    console.log(`${repos}`);
+
+
+    const delete_name : string = prompt("Enter the repo name you want to delete");
+
+    const success: boolean =  await deleteRepo(delete_name)
+
+}
+
+
+main();
 
 
 
