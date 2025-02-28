@@ -5,7 +5,7 @@ import * as https from 'https';
 
 dotenv.config();
 
-const agent: any = new https.Agent({keepAlive:true});
+const agent: any = new https.Agent({keepAlive:true, keepAliveMsecs:30000, maxSockets:5});
 
 if (process.env.GITHUB_USERNAME === undefined || process.env.GITHUB_TOKEN === undefined){
     throw new Error("Missing GitHub credentials. Please set them in the .env file")
@@ -48,10 +48,17 @@ async function deleteRepo(repo_name: string): Promise<boolean>{
     }
 
     catch(error: any){
-        console.log(`Error occured while deleting the repo ${error.message}`);
-        return false 
+        if (error.response !== undefined){
+            console.log(`Github API Error : ${error.response.status} - ${JSON.stringify(error.response.data)}`)
+        }
+        else{
+            console.log(`Error Deleting the repo ${error.message}`);
+        }
+
+        return false;
     }
 }
+
 
 async function main(){
     const repos: string[] = await getRepos();
