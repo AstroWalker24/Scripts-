@@ -20,7 +20,7 @@ async function getRepos(): Promise<string[]>{
             headers:{Authorization:`token ${GITHUB_TOKEN}`}
         });
 
-        return response.data.map((repo:any)=>repo.name + "\n");
+        return response.data.map((repo:any)=>repo.name );
     }
 
     catch(error){
@@ -33,16 +33,14 @@ async function getRepos(): Promise<string[]>{
 async function deleteRepo(repo_name: string): Promise<boolean>{
     try{
         const response: any = await axios.delete(`${API_URL}/repos/${GITHUB_USERNAME}/${repo_name}`,{
-            auth:{username: GITHUB_USERNAME, password: GITHUB_TOKEN}
+           headers:{Authorization:`token ${GITHUB_TOKEN}`}
         });
-        console.log("Successfully deleted",repo_name);
-        
+        console.log("Successfully deleted: ",repo_name);
         return true
     }
 
-    catch(error){
-        console.log("Error occured while deleting the repository")
-
+    catch(error: any){
+        console.log(`Error occured while deleting the repo ${error.message}`);
         return false 
     }
 }
@@ -55,13 +53,36 @@ async function main(){
         return ;
     }
 
-    console.log(`Found ${repos.length} repositories`);
-    console.log(`${repos}`);
+    console.log(`\n Found ${repos.length} repositories`);
+    repos.forEach((repo: string)=> console.log(repo));
 
+    const delete_name : string = prompt("\n Enter the repo name you want to delete");
 
-    const delete_name : string = prompt("Enter the repo name you want to delete");
+    if (!repos.includes(delete_name)){
+        console.log("Invalid Repo name, Enter a valid repo name");
+        return ;
 
-    const success: boolean =  await deleteRepo(delete_name)
+    }
+
+    const confirmation: string = prompt(`Are you sure you want to delete ${delete_name} (yes/no)`);
+
+    if (confirmation.toLowerCase() === 'yes'){
+        const success: boolean =  await deleteRepo(delete_name);
+        if (success){
+            console.log("Repo Deleted Successfully");
+            return ;
+        }
+        else{
+            console.log("Error occured while deleting the repo");
+            return ;
+        }
+    }
+
+    else{
+        console.log("Deletion Aborted");
+        return ;
+    }
+
 
 }
 
