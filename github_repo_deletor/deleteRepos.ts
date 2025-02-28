@@ -31,12 +31,16 @@ async function getRepos(): Promise<string[]>{
 
 
 async function deleteRepo(repo_name: string): Promise<boolean>{
-    try{
+    try{ 
+
         const response: any = await axios.delete(`${API_URL}/repos/${GITHUB_USERNAME}/${repo_name}`,{
-           headers:{Authorization:`token ${GITHUB_TOKEN}`}
+           headers:{Authorization:`token ${GITHUB_TOKEN}`},
+           timeout:10000
         });
+        
         console.log("Successfully deleted: ",repo_name);
         return true
+
     }
 
     catch(error: any){
