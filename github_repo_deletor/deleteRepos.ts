@@ -1,8 +1,11 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 const prompt: any = require('prompt-sync')();
+import * as https from 'https';
 
 dotenv.config();
+
+const agent: any = new https.Agent({keepAlive:true});
 
 if (process.env.GITHUB_USERNAME === undefined || process.env.GITHUB_TOKEN === undefined){
     throw new Error("Missing GitHub credentials. Please set them in the .env file")
@@ -17,7 +20,8 @@ const API_URL: string = 'https://api.github.com';
 async function getRepos(): Promise<string[]>{
     try{
         const response:any = await axios.get(`${API_URL}/users/${GITHUB_USERNAME}/repos`,{
-            headers:{Authorization:`token ${GITHUB_TOKEN}`}
+            headers:{Authorization:`token ${GITHUB_TOKEN}`},
+            httpsAgent: agent
         });
 
         return response.data.map((repo:any)=>repo.name );
@@ -35,7 +39,7 @@ async function deleteRepo(repo_name: string): Promise<boolean>{
 
         const response: any = await axios.delete(`${API_URL}/repos/${GITHUB_USERNAME}/${encodeURIComponent(repo_name)}`,{
            headers:{Authorization:`token ${GITHUB_TOKEN}`},
-           timeout:10000
+           httpsAgent:agent
         });
 
         console.log("Successfully deleted: ",repo_name);
