@@ -31,6 +31,20 @@ async function getRepos(): Promise<string[]>{
 }
 
 
+async function deleteRepo(repo_name: string){
+    try{
+        const response: any = await axios.delete(`${API_URL}/repos/${GITHUB_USERNAME}/${repo_name}`,{
+            auth:{username: GITHUB_USERNAME, password: GITHUB_TOKEN}
+        });
+        console.log("Successfully deleted",repo_name);
+        
+    }
+
+    catch(error){
+        console.log("Error occured while deleting the repository")
+    }
+}
+
 
 
 
